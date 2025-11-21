@@ -66,7 +66,7 @@ export const HeroSection: React.FC = () => {
             <div className="relative">
               <div className="aspect-square lg:aspect-auto lg:h-[500px] rounded-2xl overflow-hidden shadow-2xl">
                 <img
-                  src="https://images.unsplash.com/photo-1760992003987-efc5259bcfbf?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHx2b2x1bnRlZXJzJTIwaGVscGluZyUyMGNvbW11bml0eXxlbnwxfHx8fDE3NjM3MDgyNDB8MA&ixlib=rb-4.1.0&q=80&w=1080"
+                  src="https://cdn.pixabay.com/photo/2022/03/01/06/20/flag-7040685_1280.jpg"
                   alt="Волонтери допомагають громаді"
                   className="w-full h-full object-cover"
                 />
