@@ -1,80 +1,107 @@
 import React from 'react';
 
-// Типи
 export type Route = {
   path: string;
   component: React.ComponentType;
   exact?: boolean;
 };
 
-export type LinkProps = React.AnchorHTMLAttributes<HTMLAnchorElement> & {
-  to: string;
+const getBase = () => {
+  // те саме, що ти прописав у vite.config.ts → '/VolunteerAdaptive/'
+  const base = import.meta.env.BASE_URL || '/';
+  return base.endsWith('/') ? base.slice(0, -1) : base; // '/VolunteerAdaptive'
 };
 
-// --- 1. Основний хук роутера ---
+// знімаємо базовий префікс із повного шляху
+const stripBase = (fullPath: string) => {
+  const base = getBase();
+
+  if (base === '/') return fullPath || '/';
+
+  // /VolunteerAdaptive  або  /VolunteerAdaptive/
+  if (fullPath === base || fullPath === base + '/') return '/';
+
+  if (fullPath.startsWith(base + '/')) {
+    // /VolunteerAdaptive/about  ->  /about
+    return fullPath.slice(base.length);
+  }
+
+  return fullPath || '/';
+};
+
+// додаємо базовий префікс до "логічного" шляху (/about -> /VolunteerAdaptive/about)
+const withBase = (path: string) => {
+  const base = getBase(); // '/VolunteerAdaptive'
+  if (base === '/') return path || '/';
+
+  if (path === '/' || path === '') return base + '/';
+  return `${base}${path}`;
+};
+
 export const useRouter = () => {
-  const getPath = () =>
-    typeof window !== 'undefined' ? window.location.pathname : '/';
+  const getPath = () => {
+    if (typeof window === 'undefined') return '/';
+    return stripBase(window.location.pathname);
+  };
 
   const [currentPath, setCurrentPath] = React.useState(getPath);
 
   React.useEffect(() => {
     const handlePopState = () => {
-      const newPath = getPath();
-      setCurrentPath(newPath);
+      setCurrentPath(getPath());
     };
 
-    // Слухаємо подію "popstate" (браузерна кнопка "Назад")
     window.addEventListener('popstate', handlePopState);
-    // Слухаємо нашу кастомну подію "pushstate" (кліки по Link)
-    window.addEventListener('pushstate', handlePopState);
-
-    return () => {
-      window.removeEventListener('popstate', handlePopState);
-      window.removeEventListener('pushstate', handlePopState);
-    };
+    return () => window.removeEventListener('popstate', handlePopState);
   }, []);
 
-  const navigate = React.useCallback((path: string) => {
-    if (typeof window === 'undefined') return;
-    if (window.location.pathname === path) return;
+  const navigate = React.useCallback(
+    (path: string) => {
+      if (typeof window === 'undefined') return;
 
-    window.history.pushState({}, '', path);
-    
-    // Важливо: створюємо подію, щоб інші компоненти дізналися про зміну
-    const navEvent = new Event('pushstate');
-    window.dispatchEvent(navEvent);
-    
-    window.scrollTo(0, 0);
-  }, []);
+      const logicalPath = path || '/';
+      if (currentPath === logicalPath) return;
+
+      const fullPath = withBase(logicalPath);
+
+      window.history.pushState({}, '', fullPath);
+      window.dispatchEvent(new PopStateEvent('popstate'));
+      window.scrollTo(0, 0);
+    },
+    [currentPath]
+  );
 
   return { currentPath, navigate };
 };
 
-// --- 2. Компонент Link ---
+export type LinkProps = React.AnchorHTMLAttributes<HTMLAnchorElement> & {
+  to: string;
+};
+
 export const Link: React.FC<LinkProps> = ({
   to,
   onClick,
   children,
-  className,
   ...rest
 }) => {
   const { navigate } = useRouter();
 
   const handleClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
-    e.preventDefault(); // Забороняємо стандартне перезавантаження
+    e.preventDefault();
     onClick?.(e);
     navigate(to);
   };
 
+  // для SEO/правильного ховера показуємо вже повний шлях
+  const href = withBase(to);
+
   return (
-    <a href={to} onClick={handleClick} className={className} {...rest}>
+    <a href={href} onClick={handleClick} {...rest}>
       {children}
     </a>
   );
 };
 
-// --- 3. Компонент Router ---
 export const Router: React.FC<{
   routes: Route[];
   fallback?: React.ComponentType;
@@ -82,7 +109,7 @@ export const Router: React.FC<{
   const { currentPath } = useRouter();
 
   const matchedRoute = React.useMemo(() => {
-    return routes.find(route => {
+    return routes.find((route) => {
       if (route.exact) {
         return route.path === currentPath;
       }
