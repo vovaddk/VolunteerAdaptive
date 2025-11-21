@@ -33,7 +33,6 @@ const organizations = [
     volunteers: 2340,
     projects: 156,
     impact: 'Допомогли 80,000+ військових',
-    // Колір фону для лого (адаптуємо в коді)
     color: 'blue'
   },
   {
@@ -143,7 +142,6 @@ const ForOrganizationsPage: React.FC = () => {
   });
 
   // --- COLOR THEMES HELPERS ---
-  // Ці змінні гарантують правильні кольори незалежно від налаштувань Tailwind
   const isDark = mode.dark;
   
   const pageBg = isDark ? 'bg-[#0B1121]' : 'bg-slate-50';
@@ -349,39 +347,50 @@ const ForOrganizationsPage: React.FC = () => {
 
       </div>
 
-      {/* --- NEW CTA SECTION DESIGN --- */}
-      <div className={`py-16 border-t ${isDark ? 'bg-[#0B1121] border-slate-800' : 'bg-white border-slate-200'}`}>
-        <div className="container mx-auto px-4">
+      {/* --- CTA SECTION (FULLY ADAPTIVE NOW) --- */}
+      <div className={`py-16 border-t transition-colors duration-300 ${isDark ? 'bg-[#0B1121] border-slate-800' : 'bg-white border-slate-100'}`}>
+        <div className="container mx-auto px-4 py-4">
           
-          <div className="relative rounded-3xl overflow-hidden bg-[#111827] border border-slate-700 shadow-2xl">
+          <div className={`relative rounded-3xl overflow-hidden  ${
+            isDark 
+              ? 'bg-[#111827] border-slate-700' // Dark Theme Card
+              : 'bg-white border-slate-200 shadow-blue-900/5' // Light Theme Card
+          }`}>
             
-            {/* Grid Pattern Background */}
-            <div className="absolute inset-0 opacity-20 pointer-events-none">
-                <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px]"></div>
+            {/* Grid Pattern Background (Adapts Opacity) */}
+            <div className="absolute inset-0 pointer-events-none">
+                <div className={`absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px] ${isDark ? 'opacity-20' : 'opacity-10'}`}></div>
             </div>
 
-            {/* Glowing Effects */}
-            <div className="absolute -top-24 -right-24 w-96 h-96 bg-[#0066FF] rounded-full blur-[128px] opacity-20 pointer-events-none"></div>
-            <div className="absolute -bottom-24 -left-24 w-96 h-96 bg-[#FFD600] rounded-full blur-[128px] opacity-10 pointer-events-none"></div>
+            {/* Glowing Effects (Softened for Light Mode) */}
+            <div className={`absolute -top-24 -right-24 w-96 h-96 bg-[#0066FF] rounded-full blur-[128px] pointer-events-none ${isDark ? 'opacity-20' : 'opacity-5'}`}></div>
+            <div className={`absolute -bottom-24 -left-24 w-96 h-96 bg-[#FFD600] rounded-full blur-[128px] pointer-events-none ${isDark ? 'opacity-10' : 'opacity-5'}`}></div>
 
             <div className="relative z-10 p-8 md:p-12 flex flex-col md:flex-row items-center justify-between gap-10">
               
               {/* Left Content */}
               <div className="max-w-2xl">
-                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-800/50 border border-slate-700 text-[#FFD600] text-xs font-bold uppercase tracking-wider mb-6">
+                <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-full border text-xs font-bold uppercase tracking-wider mb-6 ${
+                  isDark 
+                    ? 'bg-slate-800/50 border-slate-700 text-[#FFD600]' 
+                    : 'bg-blue-50 border-blue-100 text-[#0066FF]'
+                }`}>
                   <Zap className="w-3 h-3 fill-current" />
                   <span>Для партнерів</span>
                 </div>
-                <h2 className="text-3xl md:text-4xl font-bold text-white mb-4 leading-tight">
+
+                {/* Adaptive Text Color */}
+                <h2 className={`text-3xl md:text-4xl font-bold mb-4 leading-tight ${isDark ? 'text-white' : 'text-slate-900'}`}>
                   Ваша організація змінює світ? <br/>
-                  <span className="text-slate-400">Давайте робити це разом.</span>
+                  <span className={isDark ? 'text-slate-400' : 'text-slate-500'}>Давайте робити це разом.</span>
                 </h2>
-                <p className="text-slate-400 text-lg mb-8 leading-relaxed">
+                
+                <p className={`text-lg mb-8 leading-relaxed ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
                   Платформа Volunteer+ надає інструменти для координації волонтерів, 
                   ведення обліку допомоги та прозорої звітності. Приєднуйтесь до екосистеми довіри.
                 </p>
                 
-                <div className="flex flex-wrap gap-6 text-slate-300 text-sm font-medium">
+                <div className={`flex flex-wrap gap-6 text-sm font-medium ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>
                     <div className="flex items-center gap-2">
                         <div className="w-1.5 h-1.5 rounded-full bg-[#0066FF]"></div>
                         Доступ до бази волонтерів
@@ -399,17 +408,20 @@ const ForOrganizationsPage: React.FC = () => {
 
               {/* Right Actions */}
               <div className="flex flex-col gap-4 w-full md:w-auto min-w-[200px]">
-                 <button className="group relative px-8 py-4 bg-[#FFD600] hover:bg-[#FFED4E] text-black font-bold rounded-xl transition-all transform hover:-translate-y-1 active:translate-y-0">
+                 <button className="group relative px-8 py-4 bg-[#FFD600] hover:bg-[#FFED4E] text-black font-bold rounded-xl transition-all transform hover:-translate-y-1 active:translate-y-0 shadow-lg shadow-yellow-500/20">
                    <span className="flex items-center justify-center gap-2">
                      Зареєструвати фонд
                      <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                    </span>
-                   {/* Button glow */}
-                   <div className="absolute inset-0 rounded-xl bg-[#FFD600] blur opacity-40 -z-10"></div>
                  </button>
                  
-                 <button className="px-8 py-4 bg-slate-800 hover:bg-slate-700 text-white font-bold rounded-xl border border-slate-600 transition-colors flex items-center justify-center gap-2">
-                   <LayoutGrid className="w-5 h-5 text-slate-400" />
+                 {/* Adaptive Secondary Button */}
+                 <button className={`px-8 py-4 font-bold rounded-xl border transition-colors flex items-center justify-center gap-2 ${
+                   isDark 
+                     ? 'bg-slate-800 hover:bg-slate-700 text-white border-slate-600' 
+                     : 'bg-white hover:bg-slate-50 text-slate-700 border-slate-200 shadow-sm'
+                 }`}>
+                   <LayoutGrid className={`w-5 h-5 ${isDark ? 'text-slate-400' : 'text-slate-500'}`} />
                    Дізнатись більше
                  </button>
               </div>
